@@ -15,6 +15,7 @@ from rufus_py.drives import states
 from rufus_py.drives import formatting as fo
 from rufus_py.writing.flash_usb import FlashUSB
 from rufus_py.drives.find_usb import find_usb
+from rufus_py.drives.autodetect_usb import UsbMonitor
 
 
 class LogWindow(QDialog):
@@ -73,13 +74,14 @@ class FlashWorker(QThread):
             self.progress.emit(f"Error: {str(e)}")
             self.finished.emit(False)
 
+def on_usb_added(self, node):
+    QMessageBox.information(self, "USB Inserted", f"{node} connected")
 
 class Rufus(QMainWindow):
     def __init__(self, usb_devices=None):
         super().__init__()
         self.monitor = UsbMonitor()
         self.monitor.device_added.connect(self.on_usb_added)
-        self.monitor.device_removed.connect(self.on_usb_removed)
         self.monitor.device_list_updated.connect(self.update_usb_list)
         
         self.usb_devices = usb_devices or {}
